@@ -3,10 +3,17 @@ package com.shich.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
+import com.shich.entities.render.Texture;
+import com.shich.util.Input;
+import com.shich.util.KEYS;
+import com.shich.util.Timer;
 
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Matrix4f;
 
 public class Ship {
 
@@ -17,8 +24,16 @@ public class Ship {
     private int totalMass;
     private float inertia;
 
+    private float aRot;
+    private float aVel;
+    private float aAcc;
+
+    private Vector2f pos = new Vector2f();
+    private Vector2f vel = new Vector2f();
+    private Vector2f acc = new Vector2f();
+
     public Ship() {
-        components.add(core);
+        addBlock(core);
     }
 
     public Vector2f getCoM() {
@@ -37,12 +52,13 @@ public class Ship {
         centerOfMass.add(blockCoM);
 
         totalMass += block.mass;
+        System.out.println(totalMass);
         centerOfMass.div(totalMass);
     }
 
     public void ReCalculateCoM() {
         totalMass = 0;
-        Vector2i totalCoM = new Vector2i(0, 0);
+        Vector2i totalCoM = new Vector2i();
         for (Block b : components) {
             totalMass += b.mass;
             totalCoM.add(b.location.mul(b.mass, new Vector2i()));
@@ -50,15 +66,62 @@ public class Ship {
         centerOfMass = new Vector2f(totalCoM).div(totalMass);
     }
 
-    public void update() {
+    public void update(Timer timer) {
+        int thrusterNum = 0;
+        Vector2i totalCoT = new Vector2i();
+        for (Block b : components) {
+            if (b instanceof Thruster && ((Thruster) b).on) {
+                thrusterNum++;
+                totalCoT.add(b.location);
+            }
+        }
+        Vector2f centerOfThrust = new Vector2f(totalCoT).div(thrusterNum);
 
+        acc.y = thrusterNum * timer.delta * (float) Math.cos(aRot);
+        acc.x = thrusterNum * timer.delta * (float) -Math.sin(aRot);
+
+        pos.add(vel);
+        vel.add(acc);
+
+        if (acc.x == 0 && acc.y == 0) {
+            vel.mul(0.95f);
+        }
+
+        aRot += aVel * timer.delta;
+        aVel += aAcc * timer.delta;
+
+        aAcc = 0;
+    }
+
+    public void input(Input input) {
+        for (Block block : components) {
+            block.input(input);
+        }
+        if (input.isKeyDown(KEYS.LEFT)) {
+            aAcc = 1;
+        }
+        if (input.isKeyDown(KEYS.RIGHT)) {
+            aAcc = -1;
+        }
     }
 
     public void render(Renderer renderer) {
+
+        // Matrix4f trans = new Matrix4f();
+        Matrix4f trans = new Matrix4f();
+        trans.translate(pos.x, pos.y, 0);
+        trans.rotate(aRot, 0, 0, 1);
+
+        // render components
         for (Block block : components) {
-            block.render(renderer);
+            Matrix4f result = trans.translate(block.location.x, block.location.y, 0, new Matrix4f());
+            renderer.render(result, block.model, block.texture);
         }
 
+        // render center of mass marker
+        Matrix4f result = trans.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
+        result.rotate(aRot, 0, 0, -1);
+        renderer.render(result, new Model(new Vector3f(0.5f, 0.5f, 0)), new Texture("block/marker.png"));
     }
 
     public void checkIntegrety() {

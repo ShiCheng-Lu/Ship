@@ -1,44 +1,39 @@
 package com.shich.entities;
 
 import com.shich.entities.render.Model;
-import com.shich.entities.render.Renderer;
 import com.shich.entities.render.Texture;
-
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import com.shich.util.Input;
 
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 
 public class Block {
-    public int mass;
+    protected int mass;
     // texture
-    public int health;
-    public int maxHealth;
+    protected int health;
+    protected int maxHealth;
 
-    public Vector2i location;
-    public int rotation;
+    protected Vector2i location;
+    protected int rotation;
 
-    public boolean[] attachment = new boolean[4];
+    protected boolean[] attachment = new boolean[4];
 
-    public Model model;
-    public Texture texture;
+    protected Model model;
+    protected Texture texture;
 
     // protected Asset();
 
     public Block(Vector2i location, int mass, int maxHealth) {
+        this.location = location;
+        this.mass = mass;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
-        this.location = location;
 
-        model = new Model(new Vector3f(2, 2, 0));
-        texture = new Texture("player.png");
+        model = new Model(new Vector3f(0.5f, 0.5f, 0));
+        texture = new Texture("block/block.png");
     }
 
-    public void input() {
+    public void input(Input input) {
 
-    }
-
-    public void render(Renderer renderer) {
-        renderer.render(new Matrix4f(), model, texture);
     }
 }

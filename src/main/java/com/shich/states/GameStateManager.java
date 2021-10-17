@@ -2,12 +2,16 @@ package com.shich.states;
 
 import java.util.ArrayList;
 
+import com.shich.entities.Block;
 import com.shich.entities.Ship;
+import com.shich.entities.Thruster;
 import com.shich.entities.render.Renderer;
 import com.shich.util.Camera;
 import com.shich.util.Input;
+import com.shich.util.KEYS;
 import com.shich.util.Timer;
 
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 public class GameStateManager {
@@ -25,7 +29,7 @@ public class GameStateManager {
         this.camera = camera;
 
         ship = new Ship();
-
+        ship.addBlock(new Thruster(new Vector2i(0, -1), 100, 100));
     }
 
     public void update(Timer timer) {
@@ -33,7 +37,7 @@ public class GameStateManager {
         // states.get(0).update(timer);
         // }
 
-        // ship.update(timer);
+        ship.update(timer);
     }
 
     public void input(Input input) {
@@ -46,7 +50,7 @@ public class GameStateManager {
         // setCameraPosition(new Vector3f());
         // }
 
-        // ship.input(input);
+        ship.input(input);
     }
 
     public void render(Renderer renderer) {
