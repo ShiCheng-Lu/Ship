@@ -8,7 +8,8 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 public class Block {
-    protected int mass;
+    protected float mass;
+    protected float inertia;
     // texture
     protected int health;
     protected int maxHealth;
@@ -28,6 +29,8 @@ public class Block {
         this.mass = mass;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
+
+        inertia = mass / 6;
 
         model = new Model(new Vector3f(0.5f, 0.5f, 0));
         texture = new Texture("block/block.png");

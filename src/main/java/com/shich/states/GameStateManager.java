@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.shich.entities.Block;
 import com.shich.entities.Ship;
 import com.shich.entities.Thruster;
+import com.shich.entities.Weapon;
 import com.shich.entities.render.Renderer;
 import com.shich.util.Camera;
 import com.shich.util.Input;
@@ -31,18 +32,22 @@ public class GameStateManager {
 
         ship = new Ship();
 
-        ship.addBlock(new Block(new Vector2i(-1, 1), 0, 100));
-        ship.addBlock(new Block(new Vector2i(0, 1), 0, 100));
-        ship.addBlock(new Block(new Vector2i(1, 1), 0, 100));
+        ship.addBlock(new Block(new Vector2i(-1, 1), 10, 100));
+        ship.addBlock(new Block(new Vector2i(0, 1), 10, 100));
+        ship.addBlock(new Block(new Vector2i(1, 1), 10, 100));
 
-        ship.addBlock(new Block(new Vector2i(0, 2), 0, 100));
+        ship.addBlock(new Block(new Vector2i(0, 2), 10, 100));
 
-        ship.addBlock(new Block(new Vector2i(-1, 0), 0, 100));
-        ship.addBlock(new Block(new Vector2i(1, 0), 0, 100));
+        ship.addBlock(new Block(new Vector2i(-1, 0), 10, 100));
+        ship.addBlock(new Block(new Vector2i(1, 0), 10, 100));
 
         ship.addBlock(new Thruster(new Vector2i(-1, -1), 0, 100, KEYS.LEFT));
         ship.addBlock(new Thruster(new Vector2i(1, -1), 0, 100, KEYS.RIGHT));
         ship.addBlock(new Thruster(new Vector2i(0, -1), 0, 100, KEYS.DOWN));
+
+        ship.addBlock(new Weapon(new Vector2i(0, 3), 2, 100, KEYS.UP));
+
+        ship.CalculateInertia();
     }
 
     public void update(Timer timer) {

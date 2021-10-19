@@ -20,6 +20,11 @@ public class Timer {
         last_update_time = current_time;
     }
 
+    /**
+     * get the time in seconds as a float
+     * 
+     * @return
+     */
     public float getTime() {
         return ns_to_s(System.nanoTime());
     }
