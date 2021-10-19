@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "com.shich.Main",
+            "projectName": "Parallax"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -15,7 +22,7 @@
             "name": "Launch Main",
             "request": "launch",
             "mainClass": "com.shich.Main",
-            "projectName": "Parallax"
+            "projectName": "ship"
         }
     ]
 }
