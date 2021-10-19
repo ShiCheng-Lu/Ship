@@ -12,6 +12,7 @@ import com.shich.util.KEYS;
 import com.shich.util.Timer;
 
 import org.joml.Vector2i;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class GameStateManager {
@@ -29,7 +30,19 @@ public class GameStateManager {
         this.camera = camera;
 
         ship = new Ship();
-        ship.addBlock(new Thruster(new Vector2i(0, -1), 100, 100));
+
+        ship.addBlock(new Block(new Vector2i(-1, 1), 0, 100));
+        ship.addBlock(new Block(new Vector2i(0, 1), 0, 100));
+        ship.addBlock(new Block(new Vector2i(1, 1), 0, 100));
+
+        ship.addBlock(new Block(new Vector2i(0, 2), 0, 100));
+
+        ship.addBlock(new Block(new Vector2i(-1, 0), 0, 100));
+        ship.addBlock(new Block(new Vector2i(1, 0), 0, 100));
+
+        ship.addBlock(new Thruster(new Vector2i(-1, -1), 0, 100, KEYS.LEFT));
+        ship.addBlock(new Thruster(new Vector2i(1, -1), 0, 100, KEYS.RIGHT));
+        ship.addBlock(new Thruster(new Vector2i(0, -1), 0, 100, KEYS.DOWN));
     }
 
     public void update(Timer timer) {
@@ -49,6 +62,14 @@ public class GameStateManager {
         // setCameraOffset(new Vector3f());
         // setCameraPosition(new Vector3f());
         // }
+        if (input.isKeyDown(KEYS.ACTION)) {
+            Vector2f shipPos = ship.getPosition().mul(0.7f);
+            Vector3f old = camera.getPosition().mul(0.3f);
+
+            old.sub(shipPos.x, shipPos.y, 0);
+
+            // camera.setPosition(old);
+        }
 
         ship.input(input);
     }

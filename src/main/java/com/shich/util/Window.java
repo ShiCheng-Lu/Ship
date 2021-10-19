@@ -40,6 +40,7 @@ public class Window {
                 Window.this.height = height;
                 Window.this.size_changed = true;
             }
+
             public void close() {
                 super.close();
             }
@@ -135,7 +136,7 @@ public class Window {
         // }
 
         // if (input.isKeyPressed(input.EXIT)) {
-        //     setShouldClose(true);
+        // setShouldClose(true);
         // }
     }
 
@@ -151,7 +152,7 @@ public class Window {
         double current_time = timer.getTime();
         if (current_time > time + 1) {
             time = current_time;
-            glfwSetWindowTitle(window, "Parallax    FPS: " + frame_couter);
+            glfwSetWindowTitle(window, String.format("%s    FPS: %d", title, frame_couter));
             frame_couter = 0;
         }
     }

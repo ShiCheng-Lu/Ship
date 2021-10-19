@@ -22,12 +22,13 @@ public class Ship {
 
     private Vector2f centerOfMass = new Vector2f(0, 0);
     private int totalMass;
-    private float inertia;
+    private float inertia = 10000;
 
     private float aRot;
     private float aVel;
     private float aAcc;
 
+    // relative to CoM
     private Vector2f pos = new Vector2f();
     private Vector2f vel = new Vector2f();
     private Vector2f acc = new Vector2f();
@@ -80,6 +81,7 @@ public class Ship {
         acc.y = thrusterNum * timer.delta * (float) Math.cos(aRot);
         acc.x = thrusterNum * timer.delta * (float) -Math.sin(aRot);
 
+        // force
         pos.add(vel);
         vel.add(acc);
 
@@ -87,10 +89,17 @@ public class Ship {
             vel.mul(0.95f);
         }
 
-        aRot += aVel * timer.delta;
-        aVel += aAcc * timer.delta;
+        // torque
+        if (thrusterNum != 0) {
+            float length = centerOfThrust.x - centerOfMass.x;
+            float torque = length * thrusterNum * 3;
+            aAcc = torque;
+        } else {
+            aAcc = 0;
+        }
 
-        aAcc = 0;
+        aVel += aAcc * timer.delta;
+        aRot += aVel * timer.delta;
     }
 
     public void input(Input input) {
@@ -111,10 +120,12 @@ public class Ship {
         Matrix4f trans = new Matrix4f();
         trans.translate(pos.x, pos.y, 0);
         trans.rotate(aRot, 0, 0, 1);
+        trans.translate(-centerOfMass.x, -centerOfMass.y, 0);
 
         // render components
         for (Block block : components) {
             Matrix4f result = trans.translate(block.location.x, block.location.y, 0, new Matrix4f());
+
             renderer.render(result, block.model, block.texture);
         }
 
@@ -131,5 +142,9 @@ public class Ship {
         while (connected.size() != idx) {
 
         }
+    }
+
+    public Vector2f getPosition() {
+        return new Vector2f(pos);
     }
 }

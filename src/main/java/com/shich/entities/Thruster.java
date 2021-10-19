@@ -11,16 +11,19 @@ public class Thruster extends Block {
     Texture thruster_on = new Texture("block/thruster_on.png");
     protected boolean on = false;
 
-    public Thruster(Vector2i location, int mass, int maxHealth) {
+    protected KEYS activator;
+
+    public Thruster(Vector2i location, int mass, int maxHealth, KEYS activator) {
         super(location, mass, maxHealth);
         // TODO Auto-generated constructor stub
         texture = thruster_off;
+        this.activator = activator;
     }
 
     public int thrust; // force produced
 
     public void input(Input input) {
-        if (input.isKeyDown(KEYS.UP)) {
+        if (input.isKeyDown(activator)) {
             texture = thruster_on;
             on = true;
         } else {
