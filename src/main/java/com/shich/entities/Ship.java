@@ -21,8 +21,8 @@ public class Ship {
     private Block core = new Core();
 
     private Vector2f centerOfMass = new Vector2f(0, 0);
-    private int totalMass;
-    private float inertia = 10000;
+    private int mass;
+    private float inertia;
 
     private float aRot;
     private float aVel;
@@ -49,57 +49,65 @@ public class Ship {
         Vector2f blockCoM = new Vector2f(block.location);
         blockCoM.mul(block.mass);
 
-        centerOfMass.mul(totalMass);
+        centerOfMass.mul(mass);
         centerOfMass.add(blockCoM);
 
-        totalMass += block.mass;
-        System.out.println(totalMass);
-        centerOfMass.div(totalMass);
+        mass += block.mass;
+        System.out.println(mass);
+        centerOfMass.div(mass);
     }
 
     public void ReCalculateCoM() {
-        totalMass = 0;
-        Vector2i totalCoM = new Vector2i();
+        mass = 0;
+        Vector2f totalCoM = new Vector2f();
         for (Block b : components) {
-            totalMass += b.mass;
-            totalCoM.add(b.location.mul(b.mass, new Vector2i()));
+            mass += b.mass;
+            totalCoM.add(new Vector2f(b.location).mul(b.mass));
         }
-        centerOfMass = new Vector2f(totalCoM).div(totalMass);
+        centerOfMass = new Vector2f(totalCoM).div(mass);
+    }
+
+    public void CalculateInertia() {
+        inertia = 0;
+        for (Block b : components) {
+            inertia += b.inertia;
+            float distance = 0;
+            distance += (centerOfMass.x - b.location.x) * (centerOfMass.x - b.location.x);
+            distance += (centerOfMass.y - b.location.y) * (centerOfMass.y - b.location.y);
+            inertia += b.mass * distance;
+        }
     }
 
     public void update(Timer timer) {
-        int thrusterNum = 0;
-        Vector2i totalCoT = new Vector2i();
+        float force = 0;
+        float torque = 0;
+
         for (Block b : components) {
             if (b instanceof Thruster && ((Thruster) b).on) {
-                thrusterNum++;
-                totalCoT.add(b.location);
+                force += ((Thruster) b).thrust;
+                torque += (b.location.x - centerOfMass.x) * ((Thruster) b).thrust;
             }
         }
-        Vector2f centerOfThrust = new Vector2f(totalCoT).div(thrusterNum);
-
-        acc.y = thrusterNum * timer.delta * (float) Math.cos(aRot);
-        acc.x = thrusterNum * timer.delta * (float) -Math.sin(aRot);
-
         // force
-        pos.add(vel);
-        vel.add(acc);
+        force = force / mass * timer.delta;
+        acc.y = force * (float) Math.cos(aRot);
+        acc.x = force * (float) -Math.sin(aRot);
 
-        if (acc.x == 0 && acc.y == 0) {
-            vel.mul(0.95f);
-        }
+        vel.add(acc);
+        pos.add(vel);
 
         // torque
-        if (thrusterNum != 0) {
-            float length = centerOfThrust.x - centerOfMass.x;
-            float torque = length * thrusterNum * 3;
-            aAcc = torque;
-        } else {
-            aAcc = 0;
+        aAcc = torque / inertia * timer.delta;
+        aVel += aAcc;
+
+        aRot += aVel;
+
+        //
+        if (acc.x == 0 && acc.y == 0) {
+            vel.mul(0.99f);
+            aVel *= 0.99;
         }
 
-        aVel += aAcc * timer.delta;
-        aRot += aVel * timer.delta;
     }
 
     public void input(Input input) {
