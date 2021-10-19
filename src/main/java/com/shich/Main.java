@@ -49,7 +49,7 @@ public class Main implements Runnable {
 
         gsm = new GameStateManager(camera);
     }
-    
+
     public void destroy() {
         window.destroy();
     }
@@ -62,7 +62,7 @@ public class Main implements Runnable {
     public void run() {
         init();
 
-        while (!window.shouldClose()) {            
+        while (!window.shouldClose()) {
             input(input);
             update(timer);
             render(renderer);
@@ -81,17 +81,17 @@ public class Main implements Runnable {
     }
 
     public void update(Timer timer) {
-        input.update();
         timer.update(); // must be updated before updates with timers
+        input.update();
 
         gsm.update(timer);
-        
+
         window.update(timer);
 
         if (gsm.states.isEmpty()) {
             window.setShouldClose(true);
         }
-        
+
         camera.update(); // must be updated after player update (after camera.setposition)
     }
 

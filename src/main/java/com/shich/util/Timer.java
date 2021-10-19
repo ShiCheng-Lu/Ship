@@ -1,13 +1,17 @@
 package com.shich.util;
 
 public class Timer {
-    
+
     public float delta;
     private long last_update_time;
-    private float targetDelta;
+    private double targetDelta;
+
+    public Timer(int targetFps) {
+        targetDelta = 1.0 / targetFps;
+    }
 
     public Timer() {
-        targetDelta = 1.0f / 60;
+        this(60);
     }
 
     public void update() {
@@ -24,7 +28,7 @@ public class Timer {
         return (float) nano_sec / 1000000000;
     }
 
-    public float getTargetTime() {
+    public double getTargetTime() {
         return targetDelta;
     }
 
