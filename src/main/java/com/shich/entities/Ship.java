@@ -13,6 +13,7 @@ import com.shich.util.Timer;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Matrix2f;
 import org.joml.Matrix4f;
 
 public class Ship {
@@ -28,7 +29,7 @@ public class Ship {
     private float aVel;
     private float aAcc;
 
-    // relative to CoM
+    // pos is the position of the CoM
     private Vector2f pos = new Vector2f();
     private Vector2f vel = new Vector2f();
     private Vector2f acc = new Vector2f();
@@ -53,7 +54,6 @@ public class Ship {
         centerOfMass.add(blockCoM);
 
         mass += block.mass;
-        System.out.println(mass);
         centerOfMass.div(mass);
     }
 
@@ -90,8 +90,13 @@ public class Ship {
                 forces.y += (loc.x - centerOfMass.x) * ((Thruster) block).thrust;
 
                 if (block instanceof Weapon && ((Weapon) block).shot()) {
-                    bolts.add(new Projectile(pos, aRot));
-                    System.out.println(bolts.size());
+                    Vector2f projLoc = new Vector2f(loc).sub(centerOfMass);
+
+                    projLoc.mul(new Matrix2f().rotate(aRot));
+                    projLoc.add(pos);
+
+                    bolts.add(new Projectile(projLoc, aRot, timer.getTime() + 1));
+
                 }
             }
         });
@@ -118,6 +123,7 @@ public class Ship {
         for (Projectile proj : bolts) {
             proj.update(timer);
         }
+        bolts.removeIf((proj) -> timer.getTime() > proj.lifespan);
     }
 
     public void input(Input input) {

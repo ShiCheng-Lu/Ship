@@ -2,6 +2,8 @@ package com.shich.util;
 
 public class Timer {
 
+    private long ns_since_start;
+
     public float delta;
     private long last_update_time;
     private double targetDelta;

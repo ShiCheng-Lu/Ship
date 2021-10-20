@@ -45,8 +45,9 @@ public class GameStateManager {
         ship.addBlock(new Vector2i(1, -1), new Thruster(0, 100, KEYS.RIGHT));
         ship.addBlock(new Vector2i(0, -1), new Thruster(0, 100, KEYS.DOWN));
 
-        ship.addBlock(new Vector2i(0, 3), new Weapon(2, 100, KEYS.UP));
+        ship.addBlock(new Vector2i(1, 2), new Weapon(2, 100, KEYS.UP));
 
+        ship.ReCalculateCoM();
         ship.CalculateInertia();
     }
 

@@ -25,15 +25,16 @@ public class Weapon extends Thruster {
 
     @Override
     public void input(Input input) {
-        if (!on && input.isKeyPressed(activator)) {
+        if (!on && input.isKeyDown(activator)) {
             texture = weapon_on;
             on = true;
             timer = 0;
         } else {
             timer++;
-            if (timer > 5) {
-                timer = 0;
+            if (timer > 7) {
                 texture = weapon_off;
+            }
+            if (timer > 10) {
                 on = false;
             }
         }
