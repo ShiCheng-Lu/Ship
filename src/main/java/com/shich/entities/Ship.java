@@ -1,7 +1,7 @@
 package com.shich.entities;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
 
 import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
@@ -16,9 +16,9 @@ import org.joml.Vector3f;
 import org.joml.Matrix4f;
 
 public class Ship {
+    private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
-    private List<Block> components = new ArrayList<Block>();
-    private Block core = new Core();
+    private Hashtable<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
 
     private Vector2f centerOfMass = new Vector2f(0, 0);
     private int mass;
@@ -34,19 +34,19 @@ public class Ship {
     private Vector2f acc = new Vector2f();
 
     public Ship() {
-        addBlock(core);
+        addBlock(new Vector2i(0, 0), new Block(2, 100, "block/core.png"));
     }
 
     public Vector2f getCoM() {
         return centerOfMass;
     }
 
-    public void addBlock(Block block) {
+    public void addBlock(Vector2i location, Block block) {
         // add to components;
-        components.add(block);
-
+        components.put(new Vector2i(location), block);
         // add to centerOfMass;
-        Vector2f blockCoM = new Vector2f(block.location);
+        Vector2f blockCoM = new Vector2f(location);
+
         blockCoM.mul(block.mass);
 
         centerOfMass.mul(mass);
@@ -59,37 +59,44 @@ public class Ship {
 
     public void ReCalculateCoM() {
         mass = 0;
-        Vector2f totalCoM = new Vector2f();
-        for (Block b : components) {
-            mass += b.mass;
-            totalCoM.add(new Vector2f(b.location).mul(b.mass));
-        }
-        centerOfMass = new Vector2f(totalCoM).div(mass);
+        centerOfMass.set(0, 0);
+
+        components.forEach((loc, block) -> {
+            mass += block.mass;
+            centerOfMass.add(new Vector2f(loc).mul(block.mass));
+        });
+
+        centerOfMass.div(mass);
     }
 
     public void CalculateInertia() {
         inertia = 0;
-        for (Block b : components) {
-            inertia += b.inertia;
+
+        components.forEach((loc, block) -> {
+            inertia += block.inertia;
             float distance = 0;
-            distance += (centerOfMass.x - b.location.x) * (centerOfMass.x - b.location.x);
-            distance += (centerOfMass.y - b.location.y) * (centerOfMass.y - b.location.y);
-            inertia += b.mass * distance;
-        }
+            distance += (centerOfMass.x - loc.x) * (centerOfMass.x - loc.x);
+            distance += (centerOfMass.y - loc.y) * (centerOfMass.y - loc.y);
+            inertia += block.mass * distance;
+        });
     }
 
     public void update(Timer timer) {
-        float force = 0;
-        float torque = 0;
+        Vector2f forces = new Vector2f();
 
-        for (Block b : components) {
-            if (b instanceof Thruster && ((Thruster) b).on) {
-                force += ((Thruster) b).thrust;
-                torque += (b.location.x - centerOfMass.x) * ((Thruster) b).thrust;
+        components.forEach((loc, block) -> {
+            if (block instanceof Thruster && ((Thruster) block).on) {
+                forces.x += ((Thruster) block).thrust;
+                forces.y += (loc.x - centerOfMass.x) * ((Thruster) block).thrust;
+
+                if (block instanceof Weapon && ((Weapon) block).shot()) {
+                    bolts.add(new Projectile(pos, aRot));
+                    System.out.println(bolts.size());
+                }
             }
-        }
+        });
         // force
-        force = force / mass * timer.delta;
+        float force = forces.x / mass * timer.delta;
         acc.y = force * (float) Math.cos(aRot);
         acc.x = force * (float) -Math.sin(aRot);
 
@@ -97,7 +104,7 @@ public class Ship {
         pos.add(vel);
 
         // torque
-        aAcc = torque / inertia * timer.delta;
+        aAcc = forces.y / inertia * timer.delta;
         aVel += aAcc;
 
         aRot += aVel;
@@ -108,10 +115,14 @@ public class Ship {
             aVel *= 0.99;
         }
 
+        for (Projectile proj : bolts) {
+            proj.update(timer);
+        }
     }
 
     public void input(Input input) {
-        for (Block block : components) {
+
+        for (Block block : components.values()) {
             block.input(input);
         }
         if (input.isKeyDown(KEYS.LEFT)) {
@@ -125,26 +136,29 @@ public class Ship {
     public void render(Renderer renderer) {
 
         // Matrix4f trans = new Matrix4f();
-        Matrix4f trans = new Matrix4f();
-        trans.translate(pos.x, pos.y, 0);
-        trans.rotate(aRot, 0, 0, 1);
-        trans.translate(-centerOfMass.x, -centerOfMass.y, 0);
+        Matrix4f transform = new Matrix4f();
+        transform.translate(pos.x, pos.y, 0);
+        transform.rotate(aRot, 0, 0, 1);
+        transform.translate(-centerOfMass.x, -centerOfMass.y, 0);
 
         // render components
-        for (Block block : components) {
-            Matrix4f result = trans.translate(block.location.x, block.location.y, 0, new Matrix4f());
-
+        components.forEach((loc, block) -> {
+            Matrix4f result = transform.translate(loc.x, loc.y, 0, new Matrix4f());
             renderer.render(result, block.model, block.texture);
-        }
+        });
 
         // render center of mass marker
-        Matrix4f result = trans.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
+        Matrix4f result = transform.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
         result.rotate(aRot, 0, 0, -1);
         renderer.render(result, new Model(new Vector3f(0.5f, 0.5f, 0)), new Texture("block/marker.png"));
+
+        for (Projectile proj : bolts) {
+            proj.render(renderer);
+        }
     }
 
     public void checkIntegrety() {
-        List<Block> connected = new ArrayList<Block>();
+        ArrayList<Block> connected = new ArrayList<Block>();
 
         int idx = 0;
         while (connected.size() != idx) {

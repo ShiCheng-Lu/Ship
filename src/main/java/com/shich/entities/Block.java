@@ -14,7 +14,6 @@ public class Block {
     protected int health;
     protected int maxHealth;
 
-    protected Vector2i location;
     protected int rotation;
 
     protected boolean[] attachment = new boolean[4];
@@ -22,10 +21,7 @@ public class Block {
     protected Model model;
     protected Texture texture;
 
-    // protected Asset();
-
-    public Block(Vector2i location, int mass, int maxHealth) {
-        this.location = location;
+    public Block(int mass, int maxHealth, String textureFile) {
         this.mass = mass;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
@@ -33,7 +29,11 @@ public class Block {
         inertia = mass / 6;
 
         model = new Model(new Vector3f(0.5f, 0.5f, 0));
-        texture = new Texture("block/block.png");
+        texture = new Texture(textureFile);
+    }
+
+    public Block(int mass, int maxHealth) {
+        this(mass, maxHealth, "block/block.png");
     }
 
     public void input(Input input) {

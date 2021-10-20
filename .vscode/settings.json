@@ -1,3 +1,5 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.codeGeneration.generateComments": true,
+    "java.home": "C:\\Program Files\\Java\\jdk-16.0.1"
 }
