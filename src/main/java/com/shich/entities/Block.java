@@ -16,13 +16,15 @@ public class Block {
     // 1x1 square model
     protected static final Model model = new Model(new Vector3f(0.5f, 0.5f, 0));
 
+    protected String name;
+
     protected int mass;
     protected float inertia;
     // texture
     protected int health;
     protected int maxHealth;
 
-    protected int rotation; // 0 - 3, 
+    protected int rotation; // 0 - 3,
 
     protected boolean[] attachment = new boolean[4];
 

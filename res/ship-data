@@ -4,6 +4,36 @@
         <entry>
             <key>
                 <x>0</x>
+                <y>3</y>
+            </key>
+            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weapon">
+                <mass>2</mass>
+                <inertia>0.0</inertia>
+                <health>100</health>
+                <maxHealth>100</maxHealth>
+                <rotation>0</rotation>
+                <attachment>false</attachment>
+                <attachment>false</attachment>
+                <attachment>false</attachment>
+                <attachment>false</attachment>
+                <texture>
+                    <texture_file>block/weapon.png</texture_file>
+                </texture>
+                <off_texture>
+                    <texture_file>block/weapon.png</texture_file>
+                </off_texture>
+                <on_texture>
+                    <texture_file>block/weapon_on.png</texture_file>
+                </on_texture>
+                <thrust>-5.0</thrust>
+                <activator>UP</activator>
+                <charge_time>5</charge_time>
+                <reload_time>10</reload_time>
+            </value>
+        </entry>
+        <entry>
+            <key>
+                <x>0</x>
                 <y>2</y>
             </key>
             <value>
@@ -160,37 +190,6 @@
         <entry>
             <key>
                 <x>1</x>
-                <y>2</y>
-            </key>
-            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weapon">
-                <mass>2</mass>
-                <inertia>0.0</inertia>
-                <health>100</health>
-                <maxHealth>100</maxHealth>
-                <rotation>0</rotation>
-                <attachment>false</attachment>
-                <attachment>false</attachment>
-                <attachment>false</attachment>
-                <attachment>false</attachment>
-                <texture>
-                    <texture_file>block/weapon.png</texture_file>
-                </texture>
-                <off_texture>
-                    <texture_file>block/weapon.png</texture_file>
-                </off_texture>
-                <on_texture>
-                    <texture_file>block/weapon_on.png</texture_file>
-                </on_texture>
-                <thrust>-5.0</thrust>
-                <activator>UP</activator>
-                <timer>0</timer>
-                <charge_time>5</charge_time>
-                <reload_time>10</reload_time>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>1</x>
                 <y>1</y>
             </key>
             <value>
@@ -258,11 +257,11 @@
         </entry>
     </components>
     <centerOfMass>
-        <x>0.027777778</x>
-        <y>0.75</y>
+        <x>0.0</x>
+        <y>0.7777778</y>
     </centerOfMass>
     <mass>72</mass>
-    <inertia>86.444435</inertia>
+    <inertia>91.44444</inertia>
     <aRot>0.0</aRot>
     <aVel>0.0</aVel>
     <aAcc>0.0</aAcc>

@@ -1,6 +1,6 @@
 package com.shich.entities;
 
-import java.io.Serializable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -18,16 +18,63 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Ship implements Serializable {
+public class Ship {
+    public static JAXBContext contextObj;
+    private static Marshaller marshallerObj;
+    private static Unmarshaller unmarshallerObj;
+
+    static {
+        try {
+            contextObj = JAXBContext.newInstance(Ship.class, Block.class, Thruster.class, Weapon.class);
+            marshallerObj = contextObj.createMarshaller();
+            marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            unmarshallerObj = contextObj.createUnmarshaller();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * save the {ship} to the file
+     * 
+     * @param file
+     */
+    public void save(String file) {
+        try {
+            marshallerObj.marshal(this, new File(file));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * load a {ship} from a file
+     * 
+     * @param file
+     */
+    public static Ship load(String file) {
+        try {
+            return (Ship) unmarshallerObj.unmarshal(new File(file));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
-    private Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
+    protected Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
 
     private Vector2f centerOfMass = new Vector2f(0, 0);
     private int mass;

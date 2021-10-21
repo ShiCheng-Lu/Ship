@@ -1,17 +1,18 @@
 package com.shich.entities;
 
-import com.shich.entities.render.Texture;
 import com.shich.util.Input;
 import com.shich.util.KEYS;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Weapon extends Thruster {
 
+    @XmlTransient
     private int timer;
 
     private int charge_time;
@@ -44,6 +45,6 @@ public class Weapon extends Thruster {
     }
 
     public boolean shot() {
-        return on && timer == charge_time;
+        return timer == charge_time;
     }
 }
