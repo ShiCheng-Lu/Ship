@@ -43,7 +43,7 @@ public class Ship implements Serializable {
     private Vector2f acc = new Vector2f();
 
     public Ship() {
-        addBlock(new Vector2i(0, 0), new Block(2, 100, "block/core.png"));
+        addBlock(new Vector2i(0, 0), new Block(10, 100, "block/core.png"));
     }
 
     public Vector2f getCoM() {

@@ -2,6 +2,7 @@ package com.shich.states;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import com.shich.entities.Block;
@@ -15,10 +16,12 @@ import com.shich.util.KEYS;
 import com.shich.util.Timer;
 
 import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 public class GameStateManager {
@@ -35,47 +38,41 @@ public class GameStateManager {
         states.add(new GameState(this));
         this.camera = camera;
 
-        // ship = new Ship();
+        ship = new Ship();
 
-        // // ship = new Gson().fromJson(Files.readFile("ship.json"), Ship.class);
+        // ship = new Gson().fromJson(Files.readFile("ship.json"), Ship.class);
 
-        // ship.addBlock(new Vector2i(-1, 1), new Block(10, 100));
-        // ship.addBlock(new Vector2i(0, 1), new Block(10, 100));
-        // ship.addBlock(new Vector2i(1, 1), new Block(10, 100));
+        ship.addBlock(new Vector2i(-1, 1), new Block(10, 100));
+        ship.addBlock(new Vector2i(0, 1), new Block(10, 100));
+        ship.addBlock(new Vector2i(1, 1), new Block(10, 100));
 
-        // ship.addBlock(new Vector2i(0, 2), new Block(10, 100));
+        ship.addBlock(new Vector2i(0, 2), new Block(10, 100));
 
-        // ship.addBlock(new Vector2i(-1, 0), new Block(10, 100));
-        // ship.addBlock(new Vector2i(1, 0), new Block(10, 100));
+        ship.addBlock(new Vector2i(-1, 0), new Block(10, 100));
+        ship.addBlock(new Vector2i(1, 0), new Block(10, 100));
 
-        // ship.addBlock(new Vector2i(-1, -1), new Thruster(0, 100, KEYS.LEFT));
-        // ship.addBlock(new Vector2i(1, -1), new Thruster(0, 100, KEYS.RIGHT));
-        // ship.addBlock(new Vector2i(0, -1), new Thruster(0, 100, KEYS.DOWN));
+        ship.addBlock(new Vector2i(-1, -1), new Thruster(0, 100, 10, KEYS.LEFT));
+        ship.addBlock(new Vector2i(1, -1), new Thruster(0, 100, 10, KEYS.RIGHT));
+        ship.addBlock(new Vector2i(0, -1), new Thruster(0, 100, 10, KEYS.DOWN));
 
-        // ship.addBlock(new Vector2i(1, 2), new Weapon(2, 100, KEYS.UP));
+        ship.addBlock(new Vector2i(1, 2), new Weapon(2, 100, KEYS.UP));
 
-        // ship.ReCalculateCoM();
-        // ship.CalculateInertia();
-
-        // try {
-        // FileInputStream fileIn = new FileInputStream("res/fileout");
-        // ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-        // ship = (Ship) objectIn.readObject();
-        // objectIn.close();
-        // } catch (ClassNotFoundException | IOException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
+        ship.ReCalculateCoM();
+        ship.CalculateInertia();
 
         try {
             JAXBContext contextObj = JAXBContext.newInstance(Ship.class, Block.class, Thruster.class, Weapon.class);
-            // Marshaller marshallerObj = contextObj.createMarshaller();
-            // marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            Marshaller marshallerObj = contextObj.createMarshaller();
+            marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            // marshallerObj.marshal(ship, new FileOutputStream("res/ship-data"));
 
             Unmarshaller unmarshallerObj = contextObj.createUnmarshaller();
-            ship = (Ship) unmarshallerObj.unmarshal(new FileInputStream("res/ship-data"));
+
+            // save
+            marshallerObj.marshal(ship, new FileOutputStream("res/ship-data"));
+
+            // load
+            // ship = (Ship) unmarshallerObj.unmarshal(new FileInputStream("res/ship-data"));
 
         } catch (JAXBException | FileNotFoundException e) {
             // TODO Auto-generated catch block

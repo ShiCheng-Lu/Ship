@@ -12,16 +12,16 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Weapon extends Thruster {
 
-    private static Texture weapon_off = new Texture("block/weapon.png");
-    private static Texture weapon_on = new Texture("block/weapon_on.png");
-
     private int timer;
 
-    public Weapon(int mass, int maxHealth, KEYS activator) {
-        super(mass, maxHealth, activator);
-        // TODO Auto-generated constructor stub
-        thrust = -5;
+    private int charge_time;
+    private int reload_time;
 
+    public Weapon(int mass, int maxHealth, KEYS activator) {
+        super(mass, maxHealth, -5, activator, "block/weapon_on.png", "block/weapon.png");
+
+        charge_time = 5;
+        reload_time = 10;
     }
 
     public Weapon() {
@@ -29,22 +29,21 @@ public class Weapon extends Thruster {
 
     @Override
     public void input(Input input) {
-        if (!on && input.isKeyDown(activator)) {
-            texture = weapon_on;
-            on = true;
-            timer = 0;
-        } else {
-            timer++;
-            if (timer > 7) {
-                texture = weapon_off;
+        super.input(input);
+
+        if (on || timer != 0) {
+            if (timer > charge_time) {
+                texture = off_texture;
             }
-            if (timer > 10) {
+            if (timer > charge_time + reload_time) {
                 on = false;
+                timer = 0;
             }
+            timer++;
         }
     }
 
     public boolean shot() {
-        return on && timer == 0;
+        return on && timer == charge_time;
     }
 }

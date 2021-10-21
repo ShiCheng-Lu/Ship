@@ -47,8 +47,8 @@
                 <y>0</y>
             </key>
             <value>
-                <mass>2</mass>
-                <inertia>0.0</inertia>
+                <mass>10</mass>
+                <inertia>1.0</inertia>
                 <health>100</health>
                 <maxHealth>100</maxHealth>
                 <rotation>0</rotation>
@@ -79,7 +79,12 @@
                 <texture>
                     <texture_file>block/thruster.png</texture_file>
                 </texture>
-                <on>false</on>
+                <off_texture>
+                    <texture_file>block/thruster.png</texture_file>
+                </off_texture>
+                <on_texture>
+                    <texture_file>block/thruster_on.png</texture_file>
+                </on_texture>
                 <thrust>10.0</thrust>
                 <activator>DOWN</activator>
             </value>
@@ -142,7 +147,12 @@
                 <texture>
                     <texture_file>block/thruster.png</texture_file>
                 </texture>
-                <on>false</on>
+                <off_texture>
+                    <texture_file>block/thruster.png</texture_file>
+                </off_texture>
+                <on_texture>
+                    <texture_file>block/thruster_on.png</texture_file>
+                </on_texture>
                 <thrust>10.0</thrust>
                 <activator>LEFT</activator>
             </value>
@@ -163,12 +173,19 @@
                 <attachment>false</attachment>
                 <attachment>false</attachment>
                 <texture>
-                    <texture_file>block/thruster.png</texture_file>
+                    <texture_file>block/weapon.png</texture_file>
                 </texture>
-                <on>false</on>
+                <off_texture>
+                    <texture_file>block/weapon.png</texture_file>
+                </off_texture>
+                <on_texture>
+                    <texture_file>block/weapon_on.png</texture_file>
+                </on_texture>
                 <thrust>-5.0</thrust>
                 <activator>UP</activator>
                 <timer>0</timer>
+                <charge_time>5</charge_time>
+                <reload_time>10</reload_time>
             </value>
         </entry>
         <entry>
@@ -229,18 +246,23 @@
                 <texture>
                     <texture_file>block/thruster.png</texture_file>
                 </texture>
-                <on>false</on>
+                <off_texture>
+                    <texture_file>block/thruster.png</texture_file>
+                </off_texture>
+                <on_texture>
+                    <texture_file>block/thruster_on.png</texture_file>
+                </on_texture>
                 <thrust>10.0</thrust>
                 <activator>RIGHT</activator>
             </value>
         </entry>
     </components>
     <centerOfMass>
-        <x>0.03125</x>
-        <y>0.84375</y>
+        <x>0.027777778</x>
+        <y>0.75</y>
     </centerOfMass>
-    <mass>64</mass>
-    <inertia>80.375</inertia>
+    <mass>72</mass>
+    <inertia>86.444435</inertia>
     <aRot>0.0</aRot>
     <aVel>0.0</aVel>
     <aAcc>0.0</aAcc>
