@@ -1,7 +1,9 @@
 package com.shich.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 
 import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
@@ -10,16 +12,22 @@ import com.shich.util.Input;
 import com.shich.util.KEYS;
 import com.shich.util.Timer;
 
+import org.joml.Matrix2f;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.joml.Matrix2f;
-import org.joml.Matrix4f;
 
-public class Ship {
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Ship implements Serializable {
     private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
-    private Hashtable<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
+    private Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
 
     private Vector2f centerOfMass = new Vector2f(0, 0);
     private int mass;
@@ -150,7 +158,7 @@ public class Ship {
         // render components
         components.forEach((loc, block) -> {
             Matrix4f result = transform.translate(loc.x, loc.y, 0, new Matrix4f());
-            renderer.render(result, block.model, block.texture);
+            renderer.render(result, Block.model, block.texture);
         });
 
         // render center of mass marker
@@ -174,5 +182,9 @@ public class Ship {
 
     public Vector2f getPosition() {
         return new Vector2f(pos);
+    }
+
+    public String toString() {
+        return Integer.toString(components.size());
     }
 }

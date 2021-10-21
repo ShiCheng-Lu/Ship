@@ -1,18 +1,19 @@
 package com.shich.entities;
 
-import java.util.ArrayList;
-
-import com.shich.entities.render.Renderer;
 import com.shich.entities.render.Texture;
 import com.shich.util.Input;
 import com.shich.util.KEYS;
 
-import org.joml.Vector2i;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Weapon extends Thruster {
 
-    private Texture weapon_off = new Texture("block/weapon.png");
-    private Texture weapon_on = new Texture("block/weapon_on.png");
+    private static Texture weapon_off = new Texture("block/weapon.png");
+    private static Texture weapon_on = new Texture("block/weapon_on.png");
 
     private int timer;
 
@@ -21,6 +22,9 @@ public class Weapon extends Thruster {
         // TODO Auto-generated constructor stub
         thrust = -5;
 
+    }
+
+    public Weapon() {
     }
 
     @Override

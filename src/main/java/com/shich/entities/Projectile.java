@@ -1,5 +1,7 @@
 package com.shich.entities;
 
+import java.io.Serializable;
+
 import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
 import com.shich.entities.render.Texture;
@@ -9,7 +11,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class Projectile {
+public class Projectile implements Serializable {
 
     protected float rot;
     protected Vector2f vel;

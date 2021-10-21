@@ -4,11 +4,15 @@ import com.shich.entities.render.Texture;
 import com.shich.util.Input;
 import com.shich.util.KEYS;
 
-import org.joml.Vector2i;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Thruster extends Block {
-    Texture thruster_off = new Texture("block/thruster.png");
-    Texture thruster_on = new Texture("block/thruster_on.png");
+    private static Texture thruster_off = new Texture("block/thruster.png");
+    private static Texture thruster_on = new Texture("block/thruster_on.png");
     protected boolean on = false;
     protected float thrust = 1;
 
@@ -20,6 +24,9 @@ public class Thruster extends Block {
         thrust = 10;
         texture = thruster_off;
         this.activator = activator;
+    }
+
+    public Thruster() {
     }
 
     // public void update(Timer timer, Ship ship) {
