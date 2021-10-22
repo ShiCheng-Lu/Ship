@@ -5,6 +5,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -20,8 +21,7 @@ public class Input {
 
     private boolean[] key_state = new boolean[GLFW_KEY_LAST];
     private boolean[] button_action = new boolean[GLFW_MOUSE_BUTTON_LAST];
-    public Vector3f mouse_pos; // with z = 0;
-    public Vector3f mouse_pos_raw;
+    private Vector2f mouse_pos_raw; // from bottom left (-1, -1) to top right (1, 1)
     public Camera camera;
 
     public int max_binding = 5;
@@ -32,8 +32,7 @@ public class Input {
         this.window = window;
         this.camera = camera;
 
-        mouse_pos = new Vector3f();
-        mouse_pos_raw = new Vector3f();
+        mouse_pos_raw = new Vector2f();
 
         key_callback = new GLFWKeyCallback() {
             @Override
@@ -85,9 +84,6 @@ public class Input {
 
                 mouse_pos_raw.x = (float) (xpos * 2 / width - 1);
                 mouse_pos_raw.y = (float) (1 - ypos * 2 / height);
-
-                mouse_pos = Input.this.camera
-                        .reverseProjection(new Vector3f((float) (xpos - width / 2.0), (float) (height / 2.0 - ypos), 0));
             }
 
             public void close() {
@@ -149,7 +145,7 @@ public class Input {
         bindings.get(key).remove(binding);
     }
 
-    public boolean isGLFW_KeyDown(int glfw_key) {
+    public boolean isGLFWKeyDown(int glfw_key) {
         return glfwGetKey(window.window, glfw_key) == GLFW_PRESS;
     }
 
@@ -159,7 +155,7 @@ public class Input {
 
     public boolean isKeyPressed(KEYS key) {
         for (int glfw_key : bindings.get(key)) {
-            if (key_state[glfw_key] && isGLFW_KeyDown(glfw_key)) {
+            if (key_state[glfw_key] && isGLFWKeyDown(glfw_key)) {
                 return true;
             }
         }
@@ -168,7 +164,7 @@ public class Input {
 
     public boolean isKeyReleased(KEYS key) {
         for (int glfw_key : bindings.get(key)) {
-            if (key_state[glfw_key] && !isGLFW_KeyDown(glfw_key)) {
+            if (key_state[glfw_key] && !isGLFWKeyDown(glfw_key)) {
                 return true;
             }
         }
@@ -177,7 +173,7 @@ public class Input {
 
     public boolean isKeyDown(KEYS key) {
         for (int glfw_key : bindings.get(key)) {
-            if (isGLFW_KeyDown(glfw_key)) {
+            if (isGLFWKeyDown(glfw_key)) {
                 return true;
             }
         }
@@ -209,6 +205,24 @@ public class Input {
             }
         }
         return false;
+    }
+
+    public Vector2f getMousePos(boolean useTransform, boolean useTranslate) {
+        Vector2f mouse_pos = new Vector2f(mouse_pos_raw);
+        mouse_pos.x *= window.getWidth() / 2;
+        mouse_pos.y *= window.getHeight() / 2;
+
+        if (useTransform) {
+            mouse_pos.div(camera.getScale());
+        }
+        if (useTranslate) {
+            mouse_pos.sub(camera.getPosition().x, camera.getPosition().y);
+        }
+        return mouse_pos;
+    }
+
+    public Vector2f getMousePos() {
+        return getMousePos(true, false);
     }
 
     public void update() {

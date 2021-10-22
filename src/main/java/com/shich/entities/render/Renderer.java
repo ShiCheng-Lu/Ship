@@ -29,19 +29,21 @@ public class Renderer {
     }
 
     public void render(Matrix4f trans, Model model, Texture texture) {
-        render(trans, model, texture, false);
+        render(trans, model, texture, true, true);
     }
 
-    public void render(Matrix4f trans, Model model, Texture texture, boolean absolute) {
-        if (!absolute) {
-            camera.getProjection().mul(trans, trans);
+    public void render(Matrix4f trans, Model model, Texture texture, boolean useTransform, boolean useTranslate) {
+        Matrix4f projection = useTransform ? camera.getTransform() : new Matrix4f();
+        if (useTranslate) {
+            projection.translate(camera.getPosition());
         }
+        projection.mul(trans);
 
         shader.bind();
         texture.bind();
 
         shader.setUniform("tex", 0);
-        shader.setUniform("projection", trans);
+        shader.setUniform("projection", projection);
         renderModel(model);
 
         texture.unbind();

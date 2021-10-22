@@ -46,19 +46,6 @@ public class Ship {
     }
 
     /**
-     * save the {ship} to the file
-     * 
-     * @param file
-     */
-    public void save(String file) {
-        try {
-            marshallerObj.marshal(this, new File(file));
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * load a {ship} from a file
      * 
      * @param file
@@ -72,11 +59,33 @@ public class Ship {
         return null;
     }
 
+    /**
+     * save the {ship} to the file
+     * 
+     * @param file
+     */
+    public static void save(Ship ship, String file) {
+        try {
+            marshallerObj.marshal(ship, new File(file));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * save the {ship} to the file
+     * 
+     * @param file
+     */
+    public void save(String file) {
+        Ship.save(this, file);
+    }
+
     private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
-    protected Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
+    public Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
 
-    private Vector2f centerOfMass = new Vector2f(0, 0);
+    public Vector2f centerOfMass = new Vector2f(0, 0);
     private int mass;
     private float inertia;
 
@@ -99,6 +108,9 @@ public class Ship {
 
     public void addBlock(Vector2i location, Block block) {
         // add to components;
+        if (components.containsKey(location)) {
+            delBlock(location);
+        }
         components.put(new Vector2i(location), block);
         // add to centerOfMass;
         Vector2f blockCoM = new Vector2f(location);
@@ -109,6 +121,23 @@ public class Ship {
         centerOfMass.add(blockCoM);
 
         mass += block.mass;
+        centerOfMass.div(mass);
+    }
+
+    public void delBlock(Vector2i location) {
+        Block block = components.remove(location);
+        if (block == null) {
+            return; // Block not in ship
+        }
+        // remove from centerOfMass
+        Vector2f blockCoM = new Vector2f(location);
+
+        blockCoM.mul(block.mass);
+
+        centerOfMass.mul(mass);
+        centerOfMass.sub(blockCoM);
+
+        mass -= block.mass;
         centerOfMass.div(mass);
     }
 
@@ -201,13 +230,11 @@ public class Ship {
         transform.translate(pos.x, pos.y, 0);
         transform.rotate(aRot, 0, 0, 1);
         transform.translate(-centerOfMass.x, -centerOfMass.y, 0);
-
         // render components
         components.forEach((loc, block) -> {
             Matrix4f result = transform.translate(loc.x, loc.y, 0, new Matrix4f());
-            renderer.render(result, Block.model, block.texture);
+            renderer.render(result, Block.model, block.getTexture());
         });
-
         // render center of mass marker
         Matrix4f result = transform.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
         result.rotate(aRot, 0, 0, -1);

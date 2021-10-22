@@ -14,7 +14,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Block {
     // 1x1 square model
-    protected static final Model model = new Model(new Vector3f(0.5f, 0.5f, 0));
+    public static final Model model = new Model(new Vector3f(0.5f, 0.5f, 0));
 
     protected String name;
 
@@ -53,5 +53,13 @@ public class Block {
 
     public String toString() {
         return String.format("- mass: %d\n  maxHealth: %d\n  inertia: %f", mass, maxHealth, inertia);
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public Texture getDefaultTexture() {
+        return texture;
     }
 }

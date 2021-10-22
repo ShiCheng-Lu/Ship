@@ -34,10 +34,9 @@ public class Weapon extends Thruster {
 
         if (on || timer != 0) {
             if (timer > charge_time) {
-                texture = off_texture;
+                on = false;
             }
             if (timer > charge_time + reload_time) {
-                on = false;
                 timer = 0;
             }
             timer++;

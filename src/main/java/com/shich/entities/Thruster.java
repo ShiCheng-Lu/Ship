@@ -12,7 +12,6 @@ import jakarta.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Thruster extends Block {
-    protected Texture off_texture;
     protected Texture on_texture;
 
     @XmlTransient
@@ -24,13 +23,10 @@ public class Thruster extends Block {
 
     public Thruster(int mass, int maxHealth, int thrust, KEYS activator, String on_texture_file,
             String off_texture_file) {
-        super(mass, maxHealth);
+        super(mass, maxHealth, off_texture_file);
         this.thrust = thrust;
 
         on_texture = new Texture(on_texture_file);
-        off_texture = new Texture(off_texture_file);
-
-        texture = off_texture;
         this.activator = activator;
     }
 
@@ -49,11 +45,13 @@ public class Thruster extends Block {
 
     public void input(Input input) {
         if (input.isKeyDown(activator)) {
-            texture = on_texture;
             on = true;
         } else {
-            texture = off_texture;
             on = false;
         }
+    }
+
+    public Texture getTexture() {
+        return on ? on_texture : texture;
     }
 }
