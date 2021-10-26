@@ -1,7 +1,5 @@
 package com.shich.entities;
 
-import java.io.Serializable;
-
 import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
 import com.shich.entities.render.Texture;
@@ -11,7 +9,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class Projectile implements Serializable {
+public class Projectile {
 
     protected float rot;
     protected Vector2f vel;
@@ -21,17 +19,18 @@ public class Projectile implements Serializable {
     protected Texture texture;
 
     protected float lifespan;
+    protected int damage;
 
-    public Projectile(Vector2f loc, float rot, float lifespan) {
+    public Projectile(Vector2f loc, Vector2f vel, float rot, float lifespan) {
         model = new Model(new Vector3f(0.0625f, 0.5f, 0));
         texture = new Texture("block/proj.png");
 
-        vel = new Vector2f((float) -Math.sin(rot), (float) Math.cos(rot));
-        vel.mul(0.5f);
+        this.vel = vel;
         this.pos = loc;
         this.rot = rot;
 
         this.lifespan = lifespan;
+        this.damage = 1;
     }
 
     public void update(Timer timer) {

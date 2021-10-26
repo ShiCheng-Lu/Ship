@@ -2,6 +2,7 @@ package com.shich.states;
 
 import java.util.ArrayList;
 
+import com.shich.entities.Asteroid;
 import com.shich.entities.Block;
 import com.shich.entities.Ship;
 import com.shich.entities.Thruster;
@@ -33,18 +34,30 @@ public class GameStateManager {
     Block selected;
     Vector2f selected_pos;
 
+    ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
+
     public GameStateManager(Camera camera) {
         states.add(new GameState(this));
         this.camera = camera;
 
         ship = Ship.load("res/ship-data");
+
+        asteroids.add(new Asteroid(3, 10, new Vector2f()));
+        asteroids.add(new Asteroid(3, 10, new Vector2f()));
+        asteroids.add(new Asteroid(3, 10, new Vector2f()));
     }
 
     public void update(Timer timer) {
         // if (!states.isEmpty()) {
         // states.get(0).update(timer);
         // }
-        ship.update(timer);
+        if (!building) {
+            ship.update(timer);
+            for (Asteroid asteroid : asteroids) {
+                asteroid.update(timer, ship.getProjectiles());
+            }
+            asteroids.removeIf((Asteroid asteroid) -> asteroid.destroyed());
+        }
     }
 
     public void input(Input input) {
@@ -58,11 +71,15 @@ public class GameStateManager {
         // }
         if (input.isKeyPressed(KEYS.EXIT)) {
             building = !building;
+            if (!building) {
+                ship.checkIntegrity();
+                ship.CalculateCoM();
+                ship.CalculateInertia();
+                ship.save("res/ship-data");
+            }
         }
 
         if (building) {
-            selected_pos = input.getMousePos(true, false);
-
             if (input.isButtonDown(KEYS.MOUSE_LEFT)) {
                 if (selected == null) {
                     selected = new Block(10, 10, "block/block.png");
@@ -73,6 +90,7 @@ public class GameStateManager {
                 } else if (input.isKeyDown(KEYS.RIGHT)) {
                     selected = new Weapon(10, 10, KEYS.UP);
                 }
+                selected_pos = input.getMousePos(true, false);
 
             } else if (selected != null) {
                 int pos_x = Math.round(selected_pos.x);
@@ -82,18 +100,21 @@ public class GameStateManager {
             }
 
             if (input.isButtonDown(KEYS.MOUSE_RIGHT)) {
+                selected_pos = input.getMousePos(true, false);
+
                 int pos_x = Math.round(selected_pos.x);
                 int pos_y = Math.round(selected_pos.y);
                 ship.delBlock(new Vector2i(pos_x, pos_y));
             }
         } else {
-            if (input.isKeyDown(KEYS.ACTION)) {
-                Vector2f shipPos = ship.getPosition().mul(0.7f);
-                Vector3f old = camera.getPosition().mul(0.3f);
+            // camera follow
+            float speed = ship.getSpeed(true);
+            float lerp = (speed > 10) ? speed / (10 + speed) : speed / 40 + 0.25f;
 
-                old.sub(shipPos.x, shipPos.y, 0);
-                // camera.setPosition(old);
-            }
+            Vector2f shipPos = ship.getPosition().mul(lerp);
+            camera.getPosition().mul(1 - lerp).sub(shipPos.x, shipPos.y, 0);
+
+            // camera.setPosition(old);
             ship.input(input);
         }
     }
@@ -102,9 +123,8 @@ public class GameStateManager {
         // if (!states.isEmpty())
         // states.get(0).render(renderer);
         if (building) {
-            ship.render(renderer);
-
-            renderer.render(new Matrix4f(), new Model(new Vector3f(1, 1, 0)), new Texture("mask/lightgrey.png"), false, false);
+            renderer.render(new Matrix4f(), new Model(new Vector3f(1, 1, 0)), new Texture("mask/lightgrey.png"), false,
+                    false);
 
             // render components
             ship.components.forEach((loc, block) -> {
@@ -112,16 +132,19 @@ public class GameStateManager {
                 renderer.render(result, Block.model, block.getDefaultTexture(), true, false);
             });
 
-            Matrix4f result = new Matrix4f().translate(selected_pos.x, selected_pos.y, 0);
             if (selected != null) {
+                Matrix4f result = new Matrix4f().translate(selected_pos.x, selected_pos.y, 0);
                 renderer.render(result, Block.model, selected.getDefaultTexture(), true, false);
             }
 
             // center of mass marker
-            result = new Matrix4f().translate(ship.centerOfMass.x, ship.centerOfMass.y, 0);
+            Matrix4f result = new Matrix4f().translate(ship.centerOfMass.x, ship.centerOfMass.y, 0);
             renderer.render(result, Block.model, new Texture("block/marker.png"), true, false);
         } else {
             ship.render(renderer);
+            for (Asteroid asteroid : asteroids) {
+                asteroid.render(renderer);
+            }
         }
     }
 

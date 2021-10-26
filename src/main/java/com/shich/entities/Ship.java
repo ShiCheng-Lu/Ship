@@ -25,6 +25,7 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -81,6 +82,7 @@ public class Ship {
         Ship.save(this, file);
     }
 
+    @XmlTransient
     private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
     public Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
@@ -91,12 +93,12 @@ public class Ship {
 
     private float aRot;
     private float aVel;
-    private float aAcc;
+    protected float torque;
 
     // pos is the position of the CoM
     private Vector2f pos = new Vector2f();
     private Vector2f vel = new Vector2f();
-    private Vector2f acc = new Vector2f();
+    protected float force;
 
     public Ship() {
         addBlock(new Vector2i(0, 0), new Block(10, 100, "block/core.png"));
@@ -141,7 +143,7 @@ public class Ship {
         centerOfMass.div(mass);
     }
 
-    public void ReCalculateCoM() {
+    public void CalculateCoM() {
         mass = 0;
         centerOfMass.set(0, 0);
 
@@ -166,40 +168,21 @@ public class Ship {
     }
 
     public void update(Timer timer) {
-        Vector2f forces = new Vector2f();
 
-        components.forEach((loc, block) -> {
-            if (block instanceof Thruster && ((Thruster) block).on) {
-                forces.x += ((Thruster) block).thrust;
-                forces.y += (loc.x - centerOfMass.x) * ((Thruster) block).thrust;
-
-                if (block instanceof Weapon && ((Weapon) block).shot()) {
-                    Vector2f projLoc = new Vector2f(loc).sub(centerOfMass);
-
-                    projLoc.mul(new Matrix2f().rotate(aRot));
-                    projLoc.add(pos);
-
-                    bolts.add(new Projectile(projLoc, aRot, timer.getTime() + 1));
-
-                }
-            }
-        });
+        components.forEach((loc, block) -> block.update(timer, this, loc));
         // force
-        float force = forces.x / mass * timer.delta;
-        acc.y = force * (float) Math.cos(aRot);
-        acc.x = force * (float) -Math.sin(aRot);
+        force = force / mass * timer.delta;
 
-        vel.add(acc);
+        vel.add(force * (float) -Math.sin(aRot), force * (float) Math.cos(aRot));
         pos.add(vel);
 
         // torque
-        aAcc = forces.y / inertia * timer.delta;
-        aVel += aAcc;
+        aVel += torque / inertia * timer.delta;
 
         aRot += aVel;
 
         //
-        if (acc.x == 0 && acc.y == 0) {
+        if (force == 0) {
             vel.mul(0.99f);
             aVel *= 0.99;
         }
@@ -207,7 +190,11 @@ public class Ship {
         for (Projectile proj : bolts) {
             proj.update(timer);
         }
-        bolts.removeIf((proj) -> timer.getTime() > proj.lifespan);
+        bolts.removeIf((proj) -> timer.getTime() >= proj.lifespan);
+
+        force = 0;
+        torque = 0;
+
     }
 
     public void input(Input input) {
@@ -216,10 +203,10 @@ public class Ship {
             block.input(input);
         }
         if (input.isKeyDown(KEYS.LEFT)) {
-            aAcc = 1;
+            torque = 1;
         }
         if (input.isKeyDown(KEYS.RIGHT)) {
-            aAcc = -1;
+            torque = -1;
         }
     }
 
@@ -238,20 +225,58 @@ public class Ship {
         // render center of mass marker
         Matrix4f result = transform.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
         result.rotate(aRot, 0, 0, -1);
-        renderer.render(result, new Model(new Vector3f(0.5f, 0.5f, 0)), new Texture("block/marker.png"));
+        renderer.render(result, Block.model, new Texture("block/marker.png"));
 
         for (Projectile proj : bolts) {
             proj.render(renderer);
         }
     }
 
-    public void checkIntegrety() {
-        ArrayList<Block> connected = new ArrayList<Block>();
+    public void checkIntegrity() {
+        ArrayList<Vector2i> connected = new ArrayList<Vector2i>();
+        connected.add(new Vector2i(0, 0));
 
         int idx = 0;
         while (connected.size() != idx) {
+            Vector2i pos = connected.get(idx);
+            idx++;
 
+            Block block = components.get(pos);
+            if (block == null) {
+                continue;
+            }
+            if ((block.attachment & 0b0001) != 0) {
+                Vector2i npos = new Vector2i(pos).add(0, 1);
+                if (!connected.contains(npos)) {
+                    connected.add(npos);
+                }
+            }
+            if ((block.attachment & 0b0010) != 0) {
+                Vector2i npos = new Vector2i(pos).add(0, -1);
+                if (!connected.contains(npos)) {
+                    connected.add(npos);
+                }
+            }
+            if ((block.attachment & 0b0100) != 0) {
+                Vector2i npos = new Vector2i(pos).add(1, 0);
+                if (!connected.contains(npos)) {
+                    connected.add(npos);
+                }
+            }
+            if ((block.attachment & 0b1000) != 0) {
+                Vector2i npos = new Vector2i(pos).add(-1, 0);
+                if (!connected.contains(npos)) {
+                    connected.add(npos);
+                }
+            }
         }
+
+        components.keySet().removeIf((Vector2i pos) -> !connected.contains(pos));
+    }
+
+    public float getSpeed(boolean squared) {
+        float speed = vel.x * vel.x + vel.y * vel.y;
+        return squared ? speed : (float) Math.sqrt(speed);
     }
 
     public Vector2f getPosition() {
@@ -260,5 +285,30 @@ public class Ship {
 
     public String toString() {
         return Integer.toString(components.size());
+    }
+
+    public ArrayList<Projectile> getProjectiles() {
+        return bolts;
+    }
+
+    /**
+     * add a new projectile, projectile x, y is the origin relative to the ship's
+     * (0, 0)
+     * 
+     * @param projectile
+     */
+    public void addProjectile(Projectile projectile) {
+        Matrix2f rotation = new Matrix2f().rotate(aRot);
+
+        projectile.pos.sub(centerOfMass);
+        projectile.pos.mul(rotation);
+        projectile.pos.add(pos);
+
+        projectile.vel.mul(rotation);
+        projectile.vel.add(vel);
+
+        projectile.rot += aRot;
+
+        bolts.add(projectile);
     }
 }
