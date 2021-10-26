@@ -37,6 +37,13 @@ public class Camera {
         translate.add(position);
     }
 
+    /**
+     * @return the transform
+     */
+    public Matrix4f getTransform() {
+        return new Matrix4f(transform);
+    }
+
     public Vector3f getPosition() {
         return translate;
     }
@@ -52,6 +59,10 @@ public class Camera {
         transform = new Matrix4f().setOrtho2D(-width / 2, width / 2, -height / 2, height / 2).scale(scale);
     }
 
+    public float getScale() {
+        return scale;
+    }
+
     public Matrix4f getProjection() {
         return new Matrix4f(projection);
     }
@@ -59,7 +70,7 @@ public class Camera {
     public Vector3f reverseProjection(Vector3f input_pos) {
         Vector3f result = new Vector3f();
         input_pos.div(scale, result);
-        result.sub(translate, result);
+        result.sub(translate);
         return result;
     }
 

@@ -19,17 +19,18 @@ public class Projectile {
     protected Texture texture;
 
     protected float lifespan;
+    protected int damage;
 
-    public Projectile(Vector2f loc, float rot, float lifespan) {
+    public Projectile(Vector2f loc, Vector2f vel, float rot, float lifespan) {
         model = new Model(new Vector3f(0.0625f, 0.5f, 0));
         texture = new Texture("block/proj.png");
 
-        vel = new Vector2f((float) -Math.sin(rot), (float) Math.cos(rot));
-        vel.mul(0.5f);
+        this.vel = vel;
         this.pos = loc;
         this.rot = rot;
 
         this.lifespan = lifespan;
+        this.damage = 1;
     }
 
     public void update(Timer timer) {

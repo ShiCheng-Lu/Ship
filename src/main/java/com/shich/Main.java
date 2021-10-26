@@ -72,10 +72,6 @@ public class Main implements Runnable {
     }
 
     public void input(Input input) {
-        if (input.isButtonPressed(KEYS.MOUSE_RIGHT)) {
-            System.out.println(input.mouse_pos);
-        }
-
         gsm.input(input);
         window.input(input);
     }
