@@ -14,8 +14,8 @@ public class Thruster extends Block {
 
     protected KEYS activator;
 
-    public Thruster(Vector2i location, int mass, int maxHealth, KEYS activator) {
-        super(location, mass, maxHealth);
+    public Thruster(int mass, int maxHealth, KEYS activator) {
+        super(mass, maxHealth);
         // TODO Auto-generated constructor stub
         thrust = 10;
         texture = thruster_off;
@@ -23,9 +23,9 @@ public class Thruster extends Block {
     }
 
     // public void update(Timer timer, Ship ship) {
-    //     if (on) {
-            
-    //     }
+    // if (on) {
+
+    // }
     // }
 
     public void input(Input input) {
