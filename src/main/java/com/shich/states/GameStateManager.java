@@ -134,6 +134,7 @@ public class GameStateManager {
         } else {
             // camera follow
             float speed = ship.getSpeed(true);
+            // camera speed depends on the ship speed
             float lerp = (speed > 10) ? speed / (10 + speed) : speed / 40 + 0.25f;
 
             Vector2f shipPos = ship.getPosition().mul(lerp);
