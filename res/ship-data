@@ -4,31 +4,6 @@
         <entry>
             <key>
                 <x>0</x>
-                <y>1</y>
-            </key>
-            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weapon">
-                <texture>
-                    <texture_file>block/weapon.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>0</rotation>
-                <attachment>15</attachment>
-                <on_texture>
-                    <texture_file>block/weapon_on.png</texture_file>
-                </on_texture>
-                <thrust>-10.0</thrust>
-                <activator>83</activator>
-                <charge_time>5</charge_time>
-                <reload_time>10</reload_time>
-                <projVel>1.0</projVel>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>0</x>
                 <y>0</y>
             </key>
             <value>
@@ -43,126 +18,23 @@
                 <attachment>15</attachment>
             </value>
         </entry>
-        <entry>
-            <key>
-                <x>0</x>
-                <y>-1</y>
-            </key>
-            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weapon">
-                <texture>
-                    <texture_file>block/weapon.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>2</rotation>
-                <attachment>15</attachment>
-                <on_texture>
-                    <texture_file>block/weapon_on.png</texture_file>
-                </on_texture>
-                <thrust>-10.0</thrust>
-                <activator>83</activator>
-                <charge_time>5</charge_time>
-                <reload_time>10</reload_time>
-                <projVel>1.0</projVel>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>-1</x>
-                <y>0</y>
-            </key>
-            <value>
-                <texture>
-                    <texture_file>block/block.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>0</rotation>
-                <attachment>15</attachment>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>-1</x>
-                <y>-1</y>
-            </key>
-            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="thruster">
-                <texture>
-                    <texture_file>block/thruster.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>0</rotation>
-                <attachment>15</attachment>
-                <on_texture>
-                    <texture_file>block/thruster_on.png</texture_file>
-                </on_texture>
-                <thrust>5.0</thrust>
-                <activator>87</activator>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>1</x>
-                <y>0</y>
-            </key>
-            <value>
-                <texture>
-                    <texture_file>block/block.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>0</rotation>
-                <attachment>15</attachment>
-            </value>
-        </entry>
-        <entry>
-            <key>
-                <x>1</x>
-                <y>-1</y>
-            </key>
-            <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="thruster">
-                <texture>
-                    <texture_file>block/thruster.png</texture_file>
-                </texture>
-                <mass>10</mass>
-                <inertia>1.0</inertia>
-                <health>10</health>
-                <maxHealth>10</maxHealth>
-                <rotation>0</rotation>
-                <attachment>15</attachment>
-                <on_texture>
-                    <texture_file>block/thruster_on.png</texture_file>
-                </on_texture>
-                <thrust>5.0</thrust>
-                <activator>87</activator>
-            </value>
-        </entry>
     </components>
     <centerOfMass>
         <x>0.0</x>
-        <y>-0.2857143</y>
+        <y>0.0</y>
     </centerOfMass>
-    <mass>70</mass>
-    <inertia>81.285706</inertia>
+    <mass>10</mass>
+    <inertia>1.0</inertia>
     <aRot>0.0</aRot>
     <aVel>0.0</aVel>
     <torque>0.0</torque>
     <pos>
-        <x>1.9227517</x>
-        <y>1.246225</y>
+        <x>0.0</x>
+        <y>0.0</y>
     </pos>
     <vel>
-        <x>-0.0050900723</x>
-        <y>0.006270812</y>
+        <x>0.0</x>
+        <y>0.0</y>
     </vel>
     <force>
         <x>0.0</x>

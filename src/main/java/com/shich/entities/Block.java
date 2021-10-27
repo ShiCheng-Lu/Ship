@@ -84,4 +84,25 @@ public class Block implements Cloneable {
             return null;
         }
     }
+
+    protected boolean attachableFrom(int direction) {
+        int equiv = (direction - rotation) & ~-4; // test the rotation equivalent
+        return (attachment >> equiv & 1) != 0;
+    }
+
+    /**
+     * if this block can be attached to the other block in the direction
+     * @param other
+     * @param direction
+     * @return
+     */
+    public boolean connectable(Block other, int direction) {
+        if (!attachableFrom(direction)) {
+            return false;
+        }
+        if (!other.attachableFrom(direction + 2)) {
+            return false;
+        }
+        return true;
+    }
 }

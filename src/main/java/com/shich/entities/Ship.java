@@ -41,6 +41,9 @@ public class Ship {
     private Vector2f vel = new Vector2f();
     protected Vector2f force = new Vector2f();
 
+    private static Vector2i neighbours[] = { new Vector2i(0, 1), new Vector2i(-1, 0), new Vector2i(0, -1),
+            new Vector2i(1, 0) };
+
     public Ship() {
         components.put(new Vector2i(0, 0), new Block(10, 100, "block/core.png"));
     }
@@ -221,6 +224,18 @@ public class Ship {
         }
 
         components.keySet().removeIf((Vector2i pos) -> !connected.contains(pos));
+    }
+
+    public boolean connectable(Vector2i location, Block block) {
+        for (int dir = 0; dir < 4; ++dir) {
+            Vector2i neighbourPos = new Vector2i();
+            neighbourPos.add(neighbours[dir]).add(location);
+            Block neighbour = components.get(neighbourPos);
+            if (neighbour != null && block.connectable(neighbour, dir)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public float getSpeed(boolean squared) {

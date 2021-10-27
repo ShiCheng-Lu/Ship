@@ -51,11 +51,11 @@ public class GameStateManager {
 
         ShipFactory.loadBlocks("res/block-data");
 
-        ShipFactory.put("block", new Block(10, 10, "block/block.png"));
-        ShipFactory.put("thruster", new Thruster(10, 10, 5, GLFW.GLFW_KEY_W));
-        ShipFactory.put("weapon", new Weapon(10, 10, GLFW.GLFW_KEY_S));
+        // ShipFactory.put("block", new Block(10, 10, "block/block.png"));
+        // ShipFactory.put("thruster", new Thruster(10, 10, 5, GLFW.GLFW_KEY_W));
+        // ShipFactory.put("weapon", new Weapon(10, 10, GLFW.GLFW_KEY_S));
 
-        ShipFactory.saveBlocks("res/block-data");
+        ShipFactory.loadBlocks("res/block-data");
 
     }
 
@@ -116,7 +116,11 @@ public class GameStateManager {
             } else if (selected != null) {
                 int pos_x = Math.round(selected_pos.x);
                 int pos_y = Math.round(selected_pos.y);
-                ship.addBlock(new Vector2i(pos_x, pos_y), selected);
+
+                Vector2i location = new Vector2i(pos_x, pos_y);
+                // if (ship.connectable(location, selected)) {
+                ship.addBlock(location, selected);
+                // }
                 selected = null;
             }
 
@@ -163,22 +167,11 @@ public class GameStateManager {
             });
 
             if (selected != null) {
-                Vector2i neighbours[] = { new Vector2i(0, -1), new Vector2i(0, 1), new Vector2i(-1, 0),
-                        new Vector2i(1, 0) };
                 int pos_x = Math.round(selected_pos.x);
                 int pos_y = Math.round(selected_pos.y);
-                boolean nearPlaced = false;
 
-                for (Vector2i neighbour : neighbours) {
-                    neighbour.add(pos_x, pos_y);
-
-                    if (ship.components.get(neighbour) != null) {
-                        nearPlaced = true;
-                        break;
-                    }
-                }
-
-                if (nearPlaced && selected_pos.distance(pos_x, pos_y) < 0.3) {
+                Vector2i location = new Vector2i(pos_x, pos_y);
+                if (ship.connectable(location, selected) && selected_pos.distance(pos_x, pos_y) < 0.3) {
                     selected_pos = new Vector2f(pos_x, pos_y);
                 }
 
