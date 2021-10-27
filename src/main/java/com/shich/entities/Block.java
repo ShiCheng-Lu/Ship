@@ -6,13 +6,13 @@ import com.shich.entities.render.Texture;
 import com.shich.util.Input;
 import com.shich.util.Timer;
 
+import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -20,8 +20,6 @@ public class Block {
     // 1x1 square model
     public static final Model model = new Model(new Vector3f(0.5f, 0.5f, 0));
     protected Texture texture;
-
-    protected String name;
 
     protected int mass;
     protected float inertia;
@@ -41,6 +39,8 @@ public class Block {
         inertia = mass / 6;
 
         texture = new Texture(textureFile);
+
+        rotation = 0;
     }
 
     public Block() {
@@ -57,6 +57,11 @@ public class Block {
     public void update(Timer timer, Ship ship, Vector2i blockPos) {
     }
 
+    public void render(Renderer renderer, Matrix4f transform) {
+        transform.rotate(rotation * (float) Math.PI * 0.5f, 0, 0, 1);
+        renderer.render(transform, Block.model, getTexture());
+    }
+
     public Texture getTexture() {
         return texture;
     }
@@ -65,7 +70,8 @@ public class Block {
         return texture;
     }
 
-    public void options() {
-
+    public void rotate(int amount) {
+        rotation += amount;
+        rotation %= 4;
     }
 }

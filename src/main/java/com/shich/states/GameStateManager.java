@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.shich.entities.Asteroid;
 import com.shich.entities.Block;
 import com.shich.entities.Ship;
+import com.shich.entities.ShipFactory;
 import com.shich.entities.Thruster;
 import com.shich.entities.Weapon;
 import com.shich.entities.render.Model;
@@ -19,6 +20,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.CallbackI.P;
 
 public class GameStateManager {
     /*
@@ -40,11 +43,20 @@ public class GameStateManager {
         states.add(new GameState(this));
         this.camera = camera;
 
-        ship = Ship.load("res/ship-data");
+        ship = new Ship();
 
-        asteroids.add(new Asteroid(3, 10, new Vector2f()));
-        asteroids.add(new Asteroid(3, 10, new Vector2f()));
-        asteroids.add(new Asteroid(3, 10, new Vector2f()));
+        ship.checkIntegrity();
+        ship.CalculateCoM();
+        ship.CalculateInertia();
+
+        ShipFactory.loadBlocks("res/block-data");
+
+        ShipFactory.put("block", new Block(10, 10, "block/block.png"));
+        ShipFactory.put("thruster", new Thruster(10, 10, 5, GLFW.GLFW_KEY_W));
+        ShipFactory.put("weapon", new Weapon(10, 10, GLFW.GLFW_KEY_S));
+
+        ShipFactory.saveBlocks("res/block-data");
+
     }
 
     public void update(Timer timer) {
@@ -81,16 +93,25 @@ public class GameStateManager {
 
         if (building) {
             if (input.isButtonDown(KEYS.MOUSE_LEFT)) {
-                if (selected == null) {
-                    selected = new Block(10, 10, "block/block.png");
-                } else if (input.isKeyDown(KEYS.LEFT)) {
-                    selected = new Block(10, 10, "block/block.png");
-                } else if (input.isKeyDown(KEYS.DOWN)) {
-                    selected = new Thruster(10, 10, 5, KEYS.DOWN);
-                } else if (input.isKeyDown(KEYS.RIGHT)) {
-                    selected = new Weapon(10, 10, KEYS.UP);
-                }
                 selected_pos = input.getMousePos(true, false);
+
+                if (selected != null) {
+                    if (input.isGLFWKeyDown(GLFW.GLFW_KEY_A)) {
+                        selected.rotate(-1);
+                    } else if (input.isGLFWKeyDown(GLFW.GLFW_KEY_D)) {
+                        selected.rotate(1);
+                    }
+                } else if (selected_pos.distance(10, 4) < 0.5) {
+                    selected = new Block(10, 10, "block/block.png");
+                } else if (selected_pos.distance(10, 2) < 0.5) {
+                    selected = new Thruster(10, 10, 5, GLFW.GLFW_KEY_W);
+                } else if (selected_pos.distance(10, 0) < 0.5) {
+                    selected = new Weapon(10, 10, GLFW.GLFW_KEY_S);
+                } else {
+                    int pos_x = Math.round(selected_pos.x);
+                    int pos_y = Math.round(selected_pos.y);
+                    selected = ship.delBlock(new Vector2i(pos_x, pos_y));
+                }
 
             } else if (selected != null) {
                 int pos_x = Math.round(selected_pos.x);
@@ -123,24 +144,55 @@ public class GameStateManager {
         // if (!states.isEmpty())
         // states.get(0).render(renderer);
         if (building) {
+
+            renderer.setDefaultOptions(true, false);
+
             renderer.render(new Matrix4f(), new Model(new Vector3f(1, 1, 0)), new Texture("mask/lightgrey.png"), false,
                     false);
 
+            int pos = 0;
+            for (Block block : ShipFactory.getAllBlocks()) {
+                block.render(renderer, new Matrix4f().translate(10, pos, 0));
+                pos += 2;
+            }
+
             // render components
             ship.components.forEach((loc, block) -> {
-                Matrix4f result = new Matrix4f().translate(loc.x, loc.y, 0);
-                renderer.render(result, Block.model, block.getDefaultTexture(), true, false);
+                Matrix4f transform = new Matrix4f().translate(loc.x, loc.y, 0);
+                block.render(renderer, transform);
             });
 
             if (selected != null) {
-                Matrix4f result = new Matrix4f().translate(selected_pos.x, selected_pos.y, 0);
-                renderer.render(result, Block.model, selected.getDefaultTexture(), true, false);
+                Vector2i neighbours[] = { new Vector2i(0, -1), new Vector2i(0, 1), new Vector2i(-1, 0),
+                        new Vector2i(1, 0) };
+                int pos_x = Math.round(selected_pos.x);
+                int pos_y = Math.round(selected_pos.y);
+                boolean nearPlaced = false;
+
+                for (Vector2i neighbour : neighbours) {
+                    neighbour.add(pos_x, pos_y);
+
+                    if (ship.components.get(neighbour) != null) {
+                        nearPlaced = true;
+                        break;
+                    }
+                }
+
+                if (nearPlaced && selected_pos.distance(pos_x, pos_y) < 0.3) {
+                    selected_pos = new Vector2f(pos_x, pos_y);
+                }
+
+                Matrix4f transform = new Matrix4f().translate(selected_pos.x, selected_pos.y, 0);
+                selected.render(renderer, transform);
             }
 
             // center of mass marker
             Matrix4f result = new Matrix4f().translate(ship.centerOfMass.x, ship.centerOfMass.y, 0);
-            renderer.render(result, Block.model, new Texture("block/marker.png"), true, false);
+            renderer.render(result, Block.model, new Texture("block/marker.png"));
+
         } else {
+            renderer.setDefaultOptions(true, true);
+
             ship.render(renderer);
             for (Asteroid asteroid : asteroids) {
                 asteroid.render(renderer);

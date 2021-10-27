@@ -1,10 +1,8 @@
 package com.shich.entities;
 
 import com.shich.util.Input;
-import com.shich.util.KEYS;
 import com.shich.util.Timer;
 
-import org.joml.Matrix2f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 
@@ -25,7 +23,7 @@ public class Weapon extends Thruster {
 
     private float projVel;
 
-    public Weapon(int mass, int maxHealth, KEYS activator) {
+    public Weapon(int mass, int maxHealth, int activator) {
         super(mass, maxHealth, -10, activator, "block/weapon_on.png", "block/weapon.png");
 
         charge_time = 5;
@@ -55,13 +53,31 @@ public class Weapon extends Thruster {
     public void update(Timer timer, Ship ship, Vector2i blockPos) {
         super.update(timer, ship, blockPos);
         if (this.timer == this.charge_time) {
-            ship.force += thrust;
+
             ship.torque += (blockPos.x - ship.centerOfMass.x) * thrust;
 
             Vector2f projPos = new Vector2f(blockPos);
-            Vector2f projVel = new Vector2f(0, this.projVel);
+            Vector2f projVel;
+            switch (rotation) {
+            case 0:
+                projVel = new Vector2f(0, this.projVel);
+                break;
+            case 1:
+                projVel = new Vector2f(-this.projVel, 0);
+                break;
+            case 2:
+                projVel = new Vector2f(0, -this.projVel);
+                break;
+            case 3:
+                projVel = new Vector2f(this.projVel, 0);
+                break;
+            default:
+                System.out.println("invalid rotation");
+                projVel = new Vector2f(0, 0);
+            }
+            float projRot = rotation * (float) Math.PI * 0.5f;
 
-            ship.addProjectile(new Projectile(projPos, projVel, rotation, timer.getTime() + 1));
+            ship.addProjectile(new Projectile(projPos, projVel, projRot, timer.getTime() + 1));
         }
     }
 }

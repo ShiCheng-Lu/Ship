@@ -23,13 +23,21 @@ public class Renderer {
     private Shader shader;
     private Camera camera;
 
+    private boolean useTransform = true;
+    private boolean useTranslate = true;
+
     public Renderer(Shader shader, Camera camera) {
         this.camera = camera;
         this.shader = shader;
     }
 
+    public void setDefaultOptions(boolean useTransform, boolean useTranslate) {
+        this.useTransform = useTransform;
+        this.useTranslate = useTranslate;
+    }
+
     public void render(Matrix4f trans, Model model, Texture texture) {
-        render(trans, model, texture, true, true);
+        render(trans, model, texture, useTransform, useTranslate);
     }
 
     public void render(Matrix4f trans, Model model, Texture texture, boolean useTransform, boolean useTranslate) {

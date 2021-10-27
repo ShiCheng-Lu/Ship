@@ -1,11 +1,9 @@
 package com.shich.entities;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.shich.entities.render.Model;
 import com.shich.entities.render.Renderer;
 import com.shich.entities.render.Texture;
 import com.shich.util.Input;
@@ -16,12 +14,7 @@ import org.joml.Matrix2f;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.joml.Vector3f;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -30,78 +23,26 @@ import jakarta.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Ship {
-    public static JAXBContext contextObj;
-    private static Marshaller marshallerObj;
-    private static Unmarshaller unmarshallerObj;
-
-    static {
-        try {
-            contextObj = JAXBContext.newInstance(Ship.class, Block.class, Thruster.class, Weapon.class);
-            marshallerObj = contextObj.createMarshaller();
-            marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            unmarshallerObj = contextObj.createUnmarshaller();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * load a {ship} from a file
-     * 
-     * @param file
-     */
-    public static Ship load(String file) {
-        try {
-            return (Ship) unmarshallerObj.unmarshal(new File(file));
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * save the {ship} to the file
-     * 
-     * @param file
-     */
-    public static void save(Ship ship, String file) {
-        try {
-            marshallerObj.marshal(ship, new File(file));
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * save the {ship} to the file
-     * 
-     * @param file
-     */
-    public void save(String file) {
-        Ship.save(this, file);
-    }
-
     @XmlTransient
     private ArrayList<Projectile> bolts = new ArrayList<Projectile>();
 
     public Map<Vector2i, Block> components = new Hashtable<Vector2i, Block>();
 
     public Vector2f centerOfMass = new Vector2f(0, 0);
-    private int mass;
-    private float inertia;
+    private int mass = 0;
+    private float inertia = 0;
 
-    private float aRot;
-    private float aVel;
-    protected float torque;
+    private float aRot = 0;
+    private float aVel = 0;
+    protected float torque = 0;
 
     // pos is the position of the CoM
     private Vector2f pos = new Vector2f();
     private Vector2f vel = new Vector2f();
-    protected float force;
+    protected Vector2f force = new Vector2f();
 
     public Ship() {
-        addBlock(new Vector2i(0, 0), new Block(10, 100, "block/core.png"));
+        components.put(new Vector2i(0, 0), new Block(10, 100, "block/core.png"));
     }
 
     public Vector2f getCoM() {
@@ -109,6 +50,9 @@ public class Ship {
     }
 
     public void addBlock(Vector2i location, Block block) {
+        if (location.equals(0, 0)) {
+            return;
+        }
         // add to components;
         if (components.containsKey(location)) {
             delBlock(location);
@@ -126,10 +70,10 @@ public class Ship {
         centerOfMass.div(mass);
     }
 
-    public void delBlock(Vector2i location) {
+    public Block delBlock(Vector2i location) {
         Block block = components.remove(location);
         if (block == null) {
-            return; // Block not in ship
+            return null; // Block not in ship
         }
         // remove from centerOfMass
         Vector2f blockCoM = new Vector2f(location);
@@ -141,6 +85,8 @@ public class Ship {
 
         mass -= block.mass;
         centerOfMass.div(mass);
+
+        return block;
     }
 
     public void CalculateCoM() {
@@ -171,18 +117,17 @@ public class Ship {
 
         components.forEach((loc, block) -> block.update(timer, this, loc));
         // force
-        force = force / mass * timer.delta;
+        force.mul(new Matrix2f().rotate(aRot));
+        force.mul(timer.delta / mass);
 
-        vel.add(force * (float) -Math.sin(aRot), force * (float) Math.cos(aRot));
+        vel.add(force);
         pos.add(vel);
 
         // torque
         aVel += torque / inertia * timer.delta;
-
         aRot += aVel;
 
-        //
-        if (force == 0) {
+        if (force.equals(0, 0) && torque == 0) {
             vel.mul(0.99f);
             aVel *= 0.99;
         }
@@ -192,7 +137,7 @@ public class Ship {
         }
         bolts.removeIf((proj) -> timer.getTime() >= proj.lifespan);
 
-        force = 0;
+        force.zero();
         torque = 0;
 
     }
@@ -220,7 +165,7 @@ public class Ship {
         // render components
         components.forEach((loc, block) -> {
             Matrix4f result = transform.translate(loc.x, loc.y, 0, new Matrix4f());
-            renderer.render(result, Block.model, block.getTexture());
+            block.render(renderer, result);
         });
         // render center of mass marker
         Matrix4f result = transform.translate(centerOfMass.x, centerOfMass.y, 0, new Matrix4f());
@@ -310,5 +255,9 @@ public class Ship {
         projectile.rot += aRot;
 
         bolts.add(projectile);
+    }
+
+    public void save(String file) {
+        ShipFactory.save(this, file);
     }
 }
