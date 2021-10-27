@@ -16,14 +16,14 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Block {
+public class Block implements Cloneable {
     // 1x1 square model
     public static final Model model = new Model(new Vector3f(0.5f, 0.5f, 0));
     protected Texture texture;
 
     protected int mass;
     protected float inertia;
-    
+
     protected int health;
     protected int maxHealth;
 
@@ -72,6 +72,16 @@ public class Block {
 
     public void rotate(int amount) {
         rotation += amount;
-        rotation %= 4;
+        rotation = rotation & ~-4; // modulus by 4, positive remainder % 4
+    }
+
+    @Override
+    public Block clone() {
+        try {
+            return (Block) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

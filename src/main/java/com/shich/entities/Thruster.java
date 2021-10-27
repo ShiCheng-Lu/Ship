@@ -48,7 +48,7 @@ public class Thruster extends Block {
                 break;
             case 1:
                 ship.force.x -= thrust;
-                ship.torque -= (blockPos.y - ship.centerOfMass.y) * thrust;
+                ship.torque += (blockPos.y - ship.centerOfMass.y) * thrust;
                 break;
             case 2:
                 ship.force.y -= thrust;
@@ -56,7 +56,7 @@ public class Thruster extends Block {
                 break;
             case 3:
                 ship.force.x += thrust;
-                ship.torque += (blockPos.y - ship.centerOfMass.y) * thrust;
+                ship.torque -= (blockPos.y - ship.centerOfMass.y) * thrust;
                 break;
             default:
                 break;
@@ -65,7 +65,7 @@ public class Thruster extends Block {
     }
 
     public void input(Input input) {
-        on = input.isGLFWKeyDown(activator);
+        on = input.isKeyDown(activator);
     }
 
     public Texture getTexture() {

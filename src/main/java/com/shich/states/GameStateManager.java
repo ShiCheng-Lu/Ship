@@ -96,17 +96,17 @@ public class GameStateManager {
                 selected_pos = input.getMousePos(true, false);
 
                 if (selected != null) {
-                    if (input.isGLFWKeyDown(GLFW.GLFW_KEY_A)) {
-                        selected.rotate(-1);
-                    } else if (input.isGLFWKeyDown(GLFW.GLFW_KEY_D)) {
+                    if (input.isKeyPressed(GLFW.GLFW_KEY_A)) {
                         selected.rotate(1);
+                    } else if (input.isKeyPressed(GLFW.GLFW_KEY_D)) {
+                        selected.rotate(-1);
                     }
                 } else if (selected_pos.distance(10, 4) < 0.5) {
-                    selected = new Block(10, 10, "block/block.png");
+                    selected = ShipFactory.get("block");
                 } else if (selected_pos.distance(10, 2) < 0.5) {
-                    selected = new Thruster(10, 10, 5, GLFW.GLFW_KEY_W);
+                    selected = ShipFactory.get("thruster");
                 } else if (selected_pos.distance(10, 0) < 0.5) {
-                    selected = new Weapon(10, 10, GLFW.GLFW_KEY_S);
+                    selected = ShipFactory.get("weapon");
                 } else {
                     int pos_x = Math.round(selected_pos.x);
                     int pos_y = Math.round(selected_pos.y);

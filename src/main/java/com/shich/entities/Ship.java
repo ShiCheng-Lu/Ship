@@ -50,7 +50,7 @@ public class Ship {
     }
 
     public void addBlock(Vector2i location, Block block) {
-        if (location.equals(0, 0)) {
+        if (location.equals(0, 0)) { // core should not be removed
             return;
         }
         // add to components;
@@ -71,6 +71,10 @@ public class Ship {
     }
 
     public Block delBlock(Vector2i location) {
+        if (location.equals(0, 0)) { // core should not be removed
+            return null;
+        }
+
         Block block = components.remove(location);
         if (block == null) {
             return null; // Block not in ship

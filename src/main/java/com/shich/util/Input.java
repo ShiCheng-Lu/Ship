@@ -145,62 +145,78 @@ public class Input {
         bindings.get(key).remove(binding);
     }
 
-    public boolean isGLFWKeyDown(int glfw_key) {
+    public boolean isKeyDown(int glfw_key) {
         return glfwGetKey(window.window, glfw_key) == GLFW_PRESS;
-    }
-
-    public boolean isGLFWButtonDown(int glfw_button) {
-        return glfwGetMouseButton(window.window, glfw_button) == GLFW_PRESS;
-    }
-
-    public boolean isKeyPressed(KEYS key) {
-        for (int glfw_key : bindings.get(key)) {
-            if (key_state[glfw_key] && isGLFWKeyDown(glfw_key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isKeyReleased(KEYS key) {
-        for (int glfw_key : bindings.get(key)) {
-            if (key_state[glfw_key] && !isGLFWKeyDown(glfw_key)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isKeyDown(KEYS key) {
         for (int glfw_key : bindings.get(key)) {
-            if (isGLFWKeyDown(glfw_key)) {
+            if (isKeyDown(glfw_key)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isButtonPressed(KEYS button) {
-        for (int glfw_button : bindings.get(button)) {
-            if (button_action[glfw_button] && isGLFWButtonDown(glfw_button)) {
+    public boolean isKeyPressed(int glfw_key) {
+        return key_state[glfw_key] && isKeyDown(glfw_key);
+    }
+
+    public boolean isKeyPressed(KEYS key) {
+        for (int glfw_key : bindings.get(key)) {
+            if (isKeyPressed(glfw_key)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isButtonReleased(KEYS button) {
-        for (int glfw_button : bindings.get(button)) {
-            if (button_action[glfw_button] && !isGLFWButtonDown(glfw_button)) {
+    public boolean isKeyReleased(int glfw_key) {
+        return key_state[glfw_key] && !isKeyDown(glfw_key);
+    }
+
+    public boolean isKeyReleased(KEYS key) {
+        for (int glfw_key : bindings.get(key)) {
+            if (isKeyReleased(glfw_key)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean isButtonDown(int glfw_button) {
+        return glfwGetMouseButton(window.window, glfw_button) == GLFW_PRESS;
     }
 
     public boolean isButtonDown(KEYS button) {
         for (int glfw_button : bindings.get(button)) {
-            if (isGLFWButtonDown(glfw_button)) {
+            if (isButtonDown(glfw_button)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isButtonPressed(int glfw_button) {
+        return button_action[glfw_button] && isButtonDown(glfw_button);
+    }
+
+    public boolean isButtonPressed(KEYS button) {
+        for (int glfw_button : bindings.get(button)) {
+            if (isButtonPressed(glfw_button)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isButtonReleased(int glfw_button) {
+        return button_action[glfw_button] && !isButtonDown(glfw_button);
+    }
+
+    public boolean isButtonReleased(KEYS button) {
+        for (int glfw_button : bindings.get(button)) {
+            if (isButtonReleased(glfw_button)) {
                 return true;
             }
         }

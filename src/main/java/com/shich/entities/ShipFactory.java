@@ -84,7 +84,7 @@ public class ShipFactory {
     }
 
     public static Block get(String key) {
-        return allBlocks.data.get(key);
+        return allBlocks.data.get(key).clone();
     }
 
     public static Collection<Block> getAllBlocks() {
