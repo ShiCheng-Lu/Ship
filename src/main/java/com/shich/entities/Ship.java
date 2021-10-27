@@ -194,31 +194,16 @@ public class Ship {
             idx++;
 
             Block block = components.get(pos);
-            if (block == null) {
-                continue;
-            }
-            if ((block.attachment & 0b0001) != 0) {
-                Vector2i npos = new Vector2i(pos).add(0, 1);
-                if (!connected.contains(npos)) {
-                    connected.add(npos);
+
+            for (int dir = 0; dir < 4; ++dir) {
+                Vector2i neighbourPos = new Vector2i();
+                neighbourPos.add(neighbours[dir]).add(pos);
+                if (connected.contains(neighbourPos)) {
+                    continue;
                 }
-            }
-            if ((block.attachment & 0b0010) != 0) {
-                Vector2i npos = new Vector2i(pos).add(0, -1);
-                if (!connected.contains(npos)) {
-                    connected.add(npos);
-                }
-            }
-            if ((block.attachment & 0b0100) != 0) {
-                Vector2i npos = new Vector2i(pos).add(1, 0);
-                if (!connected.contains(npos)) {
-                    connected.add(npos);
-                }
-            }
-            if ((block.attachment & 0b1000) != 0) {
-                Vector2i npos = new Vector2i(pos).add(-1, 0);
-                if (!connected.contains(npos)) {
-                    connected.add(npos);
+                Block neighbour = components.get(neighbourPos);
+                if (neighbour != null && block.connectable(neighbour, dir)) {
+                    connected.add(neighbourPos);
                 }
             }
         }
@@ -230,6 +215,7 @@ public class Ship {
         for (int dir = 0; dir < 4; ++dir) {
             Vector2i neighbourPos = new Vector2i();
             neighbourPos.add(neighbours[dir]).add(location);
+
             Block neighbour = components.get(neighbourPos);
             if (neighbour != null && block.connectable(neighbour, dir)) {
                 return true;

@@ -25,16 +25,16 @@
     </centerOfMass>
     <mass>10</mass>
     <inertia>1.0</inertia>
-    <aRot>0.0</aRot>
-    <aVel>0.0</aVel>
+    <aRot>-0.45343888</aRot>
+    <aVel>-0.010532858</aVel>
     <torque>0.0</torque>
     <pos>
-        <x>0.0</x>
-        <y>0.0</y>
+        <x>-0.061166607</x>
+        <y>-0.51166207</y>
     </pos>
     <vel>
-        <x>0.0</x>
-        <y>0.0</y>
+        <x>-0.0018981684</x>
+        <y>-0.015784867</y>
     </vel>
     <force>
         <x>0.0</x>

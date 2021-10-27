@@ -118,9 +118,9 @@ public class GameStateManager {
                 int pos_y = Math.round(selected_pos.y);
 
                 Vector2i location = new Vector2i(pos_x, pos_y);
-                // if (ship.connectable(location, selected)) {
-                ship.addBlock(location, selected);
-                // }
+                if (ship.connectable(location, selected)) {
+                    ship.addBlock(location, selected);
+                }
                 selected = null;
             }
 
